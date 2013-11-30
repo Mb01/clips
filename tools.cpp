@@ -5,10 +5,6 @@
 
 using namespace std;
 
-struct IntArray{
-    int* begin;
-    int length;
-};
 
 int* makeArray(int length){
     int* array = new int[length];
@@ -125,6 +121,7 @@ int findNotInOther(int* array1, int length1, int* array2, int length2, int maxSi
             return array1[x];
         }
     }
+    return -1;//!but better not dereference that
 }
 
 //finds and prints all duplicates. Made it easy to change to return an array of duplicates.
@@ -138,7 +135,7 @@ void findAllDuplicates(int* array, int length, int maxSize){
     }
     int iter = 0;
     int* result = makeArray(resultLength);
-    for(int x = 0; iter < resultLength; x++)//!make note of iter in comparison!
+    for(int x = 0; iter < resultLength; x++)//!this is a strange pattern
     {
         if(hash[x] > 1){
             result[iter++] = x;
@@ -171,10 +168,21 @@ int findDuplicate(int* array, int length, int maxSize){
     return -1;
 }
 
-int asToHex(char input)//takes an ASCII value REPRESENTING HEX and puts it into an INT !lowercase only!
-{
-  return (input > 0x60? input - 0x57 : input - 0x30);
+void lower(char &c){//make a char lowercase
+    c = (c > 0x40 && c < 0x5B) ? c + 0x20 : c ;
 }
+
+void lower(string &s){//in place a string lowercase
+    for(string::iterator it = s.begin(); it < s.end();it++){
+        lower(*it);
+    }
+}
+
+int asToHex(char c){//takes an ASCII value REPRESENTING HEX and puts it into an INT
+    lower(c);
+    return (c > 0x60 ? c - 0x57 : c - 0x30);
+}
+
 
 
 int main (int argc, char ** argv){

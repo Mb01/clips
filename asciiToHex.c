@@ -7,9 +7,9 @@ int asciiToHex(char input) //takes an ASCII value REPRESENTING HEX and puts it i
 
 //rewrite as
 
-int asToHex(char input){//takes an ASCII value REPRESENTING HEX and puts it into an INT !lowercase only!
+int asToHex(char input)//takes an ASCII value REPRESENTING HEX and puts it into an INT !lowercase only!
 {
-  return int((input > 0x60? input - 0x57 : input - 0x30));
+  return (input > 0x60? input - 0x57 : input - 0x30);
 }
 
 

@@ -34,3 +34,31 @@ int main(){
         };
     for(int x = 0; x < (sizeof(d)/sizeof(d[0]));x++){cout << meta[d[x]];}
 }
+
+
+#include <iostream>
+#include <string>
+using namespace std;
+
+int main()
+{
+char q = 34;
+string ar[] = {
+"#include <iostream>",
+"#include <string>",
+"using namespace std;",
+"",
+"int main()",
+"{",
+"char q = 34;",
+"string ar[] = {",
+"};",
+"for(int x = 0; x < 8; x++){cout << ar[x] << endl;}",
+"for(int x = 0; x < 13; x++){cout << q << ar[x] << q << ',' << endl;}",
+"for(int x = 8; x < 13; x++){cout << ar[x] << endl;}",
+"}",
+};
+for(int x = 0; x < 8; x++){cout << ar[x] << endl;}
+for(int x = 0; x < 13; x++){cout << q << ar[x] << q << ',' << endl;}
+for(int x = 8; x < 13; x++){cout << ar[x] << endl;}
+}

@@ -10,134 +10,26 @@ import string
 #5 +, - Add, Subtract (left-to-right precedence)
 
 
-# I started with a tree based approach like this
-
 class Node(object):
-    def __init__(self):
-        self.left = None
-        self.right = None
-        self.data = None
+
+    def __init__(self, data):
+        self.data = data
         self.parent = None
+        self.children = []
 
     def addChild(self, data):
-        if not self.left:
-            self.left = Node()
-            self.left.parent = self
-            self.left.data = data
-            return self.left
-        elif not self.right:
-            self.right = Node()
-            self.right.parent = self
-            self.right.data = data
-            return self.right
-        else:
-            raise Exception
-
-    def isRightChild(self):
-        if not self.parent:
-            return False
-        if not self.parent.right == self:
-            return False
-        return True
-    
-    def swap(self, other):
-        """swaps the whole branch"""
-        # 1 swap selfs left/right and 2 swap others left/right
-        # 3 swap self and 4 swap others parents
-        #1
-        if self.isRightChild():
-            self.parent.right = other
-        else:
-            self.parent.left = other
-        #2
-        if other.isRightChild():
-            other.parent.right = self
-        else:
-            other.parent.left = self
-        #3
-        temp = self.parent
-        self.parent = other.parent
-        #4
-        other.parent = temp.parent
-    
-    def remove(self):
-        """removes the whole branch"""
-        if self.isRightChild():
-            self.parent.right = None
-        else:
-            self.parent.left = None
-        self.parent = None
-
-    def appendTo(self, parent):
-        """appends the whole branch"""
-        self.parent = parent
-        if not self.parent.left:
-            self.parent.left = self
-            return
-        if not self.parent.right:
-            self.parent.right = self
-            return
-        raise Exception
-
-    def printAll(self):
-        """prints the subtree from node from left"""
-        if self.data:
-            print self.data
-        if self.left:
-            self.left.getTree()
-        if self.right:
-            self.right.getTree()
+        child = Node(data)
+        self.children.append(child)
+        return child
 
     def getTree(self):
         """list version of the tree"""
         result = []
         if self.data:
             result.append(self.data)
-        if self.left:
-            result.append(self.left.getTree())
-        if self.right:
-            result.append(self.right.getTree())
-        return result
 
-DIGITS = string.digits + '.'
-OPERATORS = '^*/+-'#here we leave out () to proc seperately
-
-def old_lex( s ):
-    """ add things to the tree, only process parens """
-    root = Node()
-    pos = root
-    #temp for digits
-    temp = ""
-    for x in s:
-        # Is there any way to make reading digits more straightforward while forloop is for x in s?
-        if x in DIGITS:
-            temp += x
-            continue
-        # first not in digits and there are digits to add
-        elif temp:
-            # but this way we have to flush at the end to catch a digit at the end
-            pos = pos.addChild(float(temp))# should we look
-            temp = ""
-        if x == ' ':
-            continue
-        if x in OPERATORS:
-            pos = pos.addChild(x)
-        if x == '(':
-            pos = pos.addChild('(')
-            continue
-        if x == ')':
-            while pos.data != '(':
-                pos = pos.parent
-                if pos.parent == None:
-                    raise Exception("unmatched closing paren")
-            # so we can check for unclosed parens
-            pos.data = ')'
-    if temp:
-        pos.addChild(float(temp))
-    # root always only has a left child so do we need it?
-    return root.left
-
-
+        for child in children:
+            result.append(child.getTree())
 #
 #
 #
@@ -217,20 +109,32 @@ def brute_parce( line ):
 
 def parse( line ):
     root = Node()
+    root.data = []
     pos = root
+    # go down the path
     for x in line:
-    if x == '(':
-            pos = pos.addChild('(')
+        if x == '(':
+            pos = pos.addChild([])
             continue
         if x == ')':
             pos = pos.parent
+            continue
+        pos.data.append(x)
+    
+        
 
-a = lex("-2-3")
+a = lex( "(1) + (2) + (3)" )
 print parse(a)
+#a = lex("-2-3")
+#print parse(a)
 a = lex("2+3*5")
 print parse(a)
-a = lex("((-2 + 3 + 4) * -3 + 5)")
+
+a = lex("(2+3)*5")
 print parse(a)
+exit()
+#a = lex("((-2 + 3 + 4) * -3 + 5)")
+#print parse(a)
 #print a
 
 exit()

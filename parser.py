@@ -30,14 +30,15 @@ OPERATORS = 'rcstglm||!()^*/+-'
 
 def lex( s ):
     """ add things to the tree, only process parens """
-    s.replace( 'Pi'   , str(math.pi) )
-    s.replace( 'e'    , str(math.e)  )
-    s.replace( 'sqrt' , 'r'  )
-    s.replace( 'sin'  , 's'  )
-    s.replace( 'tan'  , 't'  )
-    s.replace( 'lg'   , 'g'  )
-    s.replace( 'ln'   , 'l'  )
-    s.replace( 'mod'  , 'm'  )
+    s = s.replace( 'Pi'   , str(math.pi) )
+    s = s.replace( 'e'    , str(math.e)  )
+    s = s.replace( 'sqrt' , 'r'  )
+    s = s.replace( 'cos'  , 'c'  )
+    s = s.replace( 'sin'  , 's'  )
+    s = s.replace( 'tan'  , 't'  )
+    s = s.replace( 'lg'   , 'g'  )
+    s = s.replace( 'ln'   , 'l'  )
+    s = s.replace( 'mod'  , 'm'  )
 
     result = []
     #temp for digits
@@ -63,50 +64,84 @@ def lex( s ):
     return result
 
 
-
-
-
 def brute_parce( line ): 
+    
+    n = len(line)    
+
+    # TODO write a function that does a binary operation to reduce repitive code
+    # process factorial a unary operator written after 
+    x = 0
+    while x < n:
+        if line[x] == '!':
+            line[x - 1] = math.factorial( x - 1 )
+            line.pop(x)
+            n -= 1
+        else:
+            x += 1
 
     # process unary minus
-    for x in range(len(line)):
+    x = 0
+    while x < n:
         # error to check if float in string although I'd like it to return False here... could write function that does that
         if line[x] == '-' and (x == 0 or type(line[x - 1]) != float):
             line[x+1] = -line[x+1]
-            line[x] = None
-
-    line = [x for x in line if x != None]
+            line.pop(x)
+            n -= 1
+        else:
+            x += 1
 
     # process exponent
-    for x in range(len(line)):
+    x = 0
+    while x < n:
         if line[x] == '^':
             line[x+1] = line[x-1] ** line[x+1]
-            line[x], line[x-1] = None, None
+            line.pop(x)
+            line.pop(x -1)
+            n -= 2
+        else:
+            x += 1
 
-    line = [x for x in line if x != None]
+    # proccess mod 
+    x = 0
+    while x < n:
+        if line[x] == 'm':
+            line[x+1] = line[x-1] % line[x+1]
+            line.pop(x)
+            line.pop(x - 1)
+            n -= 2
+        else:
+            x += 1
 
     # proccess */
-    for x in range(len(line)):
+    x = 0
+    while x < n:
         if line[x] == '*':
             line[x+1] = line[x-1] * line[x+1]
-            line[x], line[x-1] = None, None
+            line.pop(x)
+            line.pop(x - 1)
+            n -= 2
         elif line[x] == '/':
             line[x+1] = line[x-1] / line[x+1]
-            line[x], line[x-1] = None, None
-    
-    line = [x for x in line if x != None]
-    
+            line.pop(x)
+            line.pop(x - 1)
+            n -= 2
+        else:
+            x += 1
     # proccess +-
-    for x in range(len(line)):
+    x = 0
+    while x < n:
         if line[x] == '+':
             line[x+1] = line[x-1] + line[x+1]
-            line[x], line[x-1] = None, None
+            line.pop(x)
+            line.pop(x - 1)
+            n -= 2
         elif line[x] == '-':
             line[x+1] = line[x-1] - line[x+1]
-            line[x], line[x-1] = None, None
-
-    line = [x for x in line if x != None]
-
+            line.pop(x)
+            line.pop(x - 1)
+            n -= 2
+        else:
+            x += 1
     return line
 
 
@@ -114,15 +149,18 @@ def brute_parce( line ):
 
 
 
-class Node(object):
 
-    def __init__(self, data, parent=None):
+
+class Node(object):
+    
+    def __init__(self, data, parent=None, absval=False):
         self.data = data
         self.parent = parent
+        self.absval = absval
 
-    def addChild(self, data):
+    def addChild(self, data, absval=False):
         # we can think of everything is children
-        child = Node(data, self)
+        child = Node(data, self, absval=absval)
         self.data.append(child)
         return child
 
@@ -146,6 +184,23 @@ class Node(object):
 
 # here is where () are processed so functions should also happen here
 # find value of each node with brute_parce() if it has no children, bottom up from left
+
+def log10(x):
+    return math.log(x,10)
+
+ops = {
+    'r' : math.sqrt,
+    'c' : math.cos,
+    's' : math.sin,
+    't' : math.tan,
+    'g' : log10,
+    'l' : math.log,
+    }
+
+
+# recursive function to be called by parse
+# look at a node, if it has a node in its data, call recurse on that
+# after that process all remaining operators with brute_parse
 def recurse( node ):
     if not node.data:
         return
@@ -156,29 +211,76 @@ def recurse( node ):
 
     # pull children up
     for x,d in enumerate(node.data):
-        if type(d) == Node:
-            node.data[x] = d.data[0]
-        if type(d) 
-            
 
+        if type(d) == Node:
+            if d.absval == True:
+                node.data[x] = abs(d.data[0])            
+            else:
+                node.data[x] = d.data[0]
+            
+        # if a function is called on something perform it        
+        if type(node.data[x-1]) == str and node.data[x-1] in 'rcstgl':
+            # we replace what the function has been called on with the return value
+            node.data[x] = ops[ node.data[x-1] ](d.data[0])# <- this is a function call
+            # remove the function call operator from the list
+            node.data.pop(x-1)
     # reduce the data
     node.data = brute_parce(node.data)
 
-# build a tree of parenthesis and call a recursive function
+# build a tree of parenthesis and call and pass to recurse
 def parse( line ):
     root = Node([])
-    pos = root
+    pos = root    
+    opening_abs = []
 
-    for x in line:
+    for n, x in enumerate(line):
         if x == '(':
             pos = pos.addChild([])
 
         elif x == ')':
             pos = pos.parent
 
+        # since abs open and close are both '|'
+        # and they are nested in the test suite, this gives us a tricky problem
+        # I guess we have to look at the operators for a hint
+        # ex. ||2.24 / (-99)| + 29|
+        # niave is ()2.24 / -99( + 29)
+        # I'm sure its ((2.24 / -99) + 29) that is meant
+        # here we see that if something comes before operator such as "a | + b", than it should be closing
+        #  
+        # this really breaks our analyze parens before operators first approach
+        # reasonable behavior:
+        #     first '|' is opening and last '|' is closing
+        #     if there is a number or '(' or another '|' after an _OPENING_ '|', or  then it is opening
+        #     otherwise it is closing 
+        #     must check for unary minus
+
+        
+        elif x == '|':
+            # last operation of '|' is closing
+            if n == len(line) -1 or '|' not in line[n+1:]:
+                pos = pos.parent
+                continue
+            # first | is always opening and if the preceding is an opening, note: empty '||' can break the parser
+            elif not opening_abs or (n - 1) in opening_abs:
+                pos = pos.addChild([], absval=True)
+                opening_abs.append(n)
+                continue    
+            # check if there is another character and some
+            elif n+1 < len(line) and n - 1 >= 0:
+                # check for unary minus after the '|'
+                if line[n + 1] == '-' and ( type(line[n - 1]) == float or line[ n - 1] == ')' ):
+                    # then we check for a left val
+                    # if the value on the left is a number or ')' then it is binary '-' and therefore '|' is closing
+                    pos = pos.parent
+                    continue
+            else:
+                pos = pos.addChild([], absval=True)
+                opening_abs.append(n)
+                continue  
+            
         else:    
             pos.data.append(x)
-
     recurse(root)
     return root.data[0]
 
@@ -226,13 +328,12 @@ def roun( num ):
         return integerPart + '.' + decimalApprox
     return integerPart
 
-
 f = open(sys.argv[1], 'r')
 lines = [x.replace( '\n', '') for x in f if x != '\n']
 
 for lin in lines:
     if not lin or lin == '\n':
         continue
+    # In real life put in try blocks but I want errors now
     answer = parse( lex( lin ) )
     print roun(answer)
-

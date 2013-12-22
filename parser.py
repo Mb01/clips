@@ -29,7 +29,7 @@ DIGITS = string.digits + '.'
 OPERATORS = 'rcstglm||!()^*/+-'
 
 def lex( s ):
-    """ add things to the tree, only process parens """
+    """ break s into a list of symbols """
     s = s.replace( 'Pi'   , str(math.pi) )
     s = s.replace( 'e'    , str(math.e)  )
     s = s.replace( 'sqrt' , 'r'  )

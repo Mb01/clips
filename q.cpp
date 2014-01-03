@@ -1,3 +1,12 @@
+
+//when I first read about the problem and first learned c++ I wrote these intentionally not looking at examples
+//should have split into seperate files but who cares?
+//nothing to brag about I guess
+//first attempt leaves out including directives and helper functions but hey
+#include <iostream>
+#include <string>
+using namespace std;
+
 string q(string x)//add quotes
 {x = "\"" + x + "\"";return x;}
 
@@ -9,8 +18,13 @@ int main(){
     cout << d[0] + q(d[0]) + d[1] + q(d[1]) + d[1] + q(d[2]) + d[1] + q(d[3]) + d[2] + d[3];
 }
 
+//prints without comments, although I could have removed them anyway
+//why did I use sizeof and such?
+//also doesn't print "d" why not?
 
-
+#include <iostream>
+#include <string>
+using namespace std;
 
 int main(){
     int d[] =    {3,2,4,2,5,2,2,6,2,8,2,7,2,0,1,0,0,10,2,0,1,1,0,10,2,0,1,11,0,10,2,0,3,0,10,2,
@@ -35,6 +49,8 @@ int main(){
     for(int x = 0; x < (sizeof(d)/sizeof(d[0]));x++){cout << meta[d[x]];}
 }
 
+
+//another more popular way
 
 #include <iostream>
 #include <string>

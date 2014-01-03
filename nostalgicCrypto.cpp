@@ -1,6 +1,9 @@
 
-//back before I organized anything and wrote giant monolithic programs
-//and factored in from all the source files into one
+//factored in from all the source files into one
+//why did I not create a folder?
+
+//this program breaks an xor stream cipher (sometimes) if the allignment and charset is known
+//e.g. each method starts at the same position
 
 #ifndef TEXTS_H_INCLUDED
 #define TEXTS_H_INCLUDED
@@ -310,7 +313,7 @@ void Deducer::test()
     this->p_texts->getLinesAsString();
 }
 
-
+//gives us the candidates for the answer, if each position has one candidate the problem is solved
 void Deducer::printCandidates(){
     vector< set<int> >::iterator vsi;
     set<int>::iterator si;

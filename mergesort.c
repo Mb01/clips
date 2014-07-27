@@ -4,13 +4,13 @@
 #include "list.h"
 
 /* returns pointer to head of sorted list */
-node* list_merge_sort(node* list){
+node* list_merge_sort(node* left){
 
     /* one element by itself is sorted */
-    if(!list->next){
-        return list;
+    if(!left->next){
+        return left;
     }
-    node *middle = list, *end = list;
+    node *middle = left, *end = left;
     /* find a suitable middle node at which to split */
     while(end){
         end = end->next;
@@ -25,11 +25,9 @@ node* list_merge_sort(node* list){
         right = middle->next;
         middle->next = NULL;
     }else{
-        right = list->next;
-        list->next = NULL;
+        right = left->next;
+        left->next = NULL;
     }
-    /* make this more readable */
-    node *left = list;
 
     /* call recursively on halves */
     left = list_merge_sort(left);
@@ -38,39 +36,32 @@ node* list_merge_sort(node* list){
     /* put back together in order */
     /* the first element of the list will change we need to track what that is and return it */
     node *head = NULL, *pos = NULL;
-    if(left->data < right->data){
-        pos = left;
-        head = left;
-        left = left->next;
-    }else{
-        pos = right;
-        head = right;
-        right = right->next;
-    }
 
     while(left || right){
         /* check if we can use from left */
+        node* use = NULL;
         if(!right || (left && left->data <= right->data)){
-            /* this is the only order that works */
-            pos->next = left;
-            pos = left;
+            use = left;
             left = left->next;
-            pos->next = NULL;
         }
         /* else use right as next */
         else{
-            pos->next = right;
-            pos = right;
+            use = right;
             right = right->next;
-            pos->next = NULL;
         }
+        
+        if(!head){
+            head = use;
+            pos = head;
+        }
+            pos->next = use;
+            pos = use;
     }
     return head;
 }
 
 int main(int argc, char** argv){
     node* list = filetolist(argv[1]);
-    list_print(list);
     list = list_merge_sort(list);
     list_print(list);
 }

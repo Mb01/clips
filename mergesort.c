@@ -31,7 +31,6 @@ node* list_merge_sort(node* list){
     /* make this more readable */
     node *left = list;
 
-
     /* call recursively on halves */
     left = list_merge_sort(left);
     right = list_merge_sort(right);
@@ -62,7 +61,6 @@ node* list_merge_sort(node* list){
         else{
             pos->next = right;
             pos = right;
-                /* funny story this was left = right->next; took me an hour to find */
             right = right->next;
             pos->next = NULL;
         }

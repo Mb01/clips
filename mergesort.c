@@ -1,7 +1,7 @@
 /* a linked list implementation */
 #include <stdlib.h>
 #include <stdio.h>
-#include "list.h"
+#include "list.h" /* typedef struct node node | filetolist(char* filename) | list_print(node* head) */
 
 /* returns pointer to head of sorted list */
 /* it might be simpler to have a reference to left and set that to head at the end */

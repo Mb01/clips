@@ -51,10 +51,11 @@ node* list_merge_sort(node* left){
             use = right;
             right = right->next;
         }
-        
+        /* the head is the first node used */
         if(!head){
             pos = head = use;
         }
+        /* set the next node in the new list to use and move position to that */
             pos->next = use;
             pos = use;
     }
